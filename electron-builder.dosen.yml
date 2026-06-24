@@ -1,0 +1,32 @@
+appId: com.aegisexam.dosen
+productName: AegisExam Dosen
+asar: false
+directories:
+  output: dist/dosen
+files:
+  - .env
+  - electron.js
+  - preload.js
+  - electron-server.php
+  - electron.dosen.js
+  - php.ini
+  - php/**/*
+  - package.json
+  - app/**/*
+  - bootstrap/**/*
+  - config/**/*
+  - database/**/*
+  - JALANKAN.txt
+  - public/**/*
+  - resources/**/*
+  - routes/**/*
+  - storage/**/*
+  - vendor/**/*
+  - node_modules/localtunnel/**/*
+extraMetadata:
+  main: electron.dosen.js
+win:
+  icon: public/aegis_logo.png
+  signAndEditExecutable: false
+  target:
+    - dir

@@ -1,0 +1,38 @@
+AegisExam Desktop — Cara Menjalankan
+================================================================
+
+
+CARA PAKAI (PENTING — pakai yang di folder win-unpacked):
+1. Buka folder dist\mahasiswa\win-unpacked
+   → Double-click "AegisExam Mahasiswa.exe"
+
+2. Buka folder dist\dosen\win-unpacked
+   → Double-click "AegisExam Dosen.exe"
+
+JANGAN pakai file "AegisExam Mahasiswa 1.0.0.exe" di luar folder win-unpacked.
+Itu installer portable LAMA (bisa tidak muncul / versi usang). Abaikan atau hapus saja.
+
+3. MODE CLOUD (rumah ↔ kampus, pakai internet):
+   a) Buka AegisExam Dosen di PC rumah (jangan ditutup)
+   b) Tunggu URL Cloud muncul di dashboard (contoh: https://xxxx.loca.lt)
+   c) Di kampus: AegisExam Mahasiswa → tab Cloud → paste URL tersebut
+   d) Internet wajib aktif. Tunnel gratis bisa lambat / kadang putus.
+
+4. MULTI-DEVICE LAN (satu WiFi):
+   a) Di PC SERVER: buka dulu "AegisExam Dosen.exe" (ini yang menjalankan server)
+   b) Catat IP di dashboard dosen (kotak "Multi-device / LAN"), contoh: http://192.168.1.10:8000
+   c) Di laptop mahasiswa: buka "AegisExam Mahasiswa.exe"
+   d) Isi IP server (angka saja, misal 192.168.1.10) lalu Sambungkan
+   e) Semua harus satu WiFi / LAN yang sama
+   f) Windows Firewall di PC dosen: izinkan port 8000 jika diminta
+
+   (Mode satu PC saja: mahasiswa isi 127.0.0.1 atau IP yang sama)
+
+CATATAN:
+- Pertama kali buka bisa memakan waktu 1–2 menit (normal).
+- Pindahkan folder ke C:\AegisExam\ jika terasa lambat (hindari folder Downloads).
+- Data ujian tersimpan di: %AppData%\AegisExam\data\
+
+REBUILD (untuk developer):
+  npm run dist:mahasiswa
+  npm run dist:dosen

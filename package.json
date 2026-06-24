@@ -1,0 +1,29 @@
+{
+    "name": "aegisexam",
+    "version": "1.0.0",
+    "private": true,
+    "main": "electron.js",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "desktop": "node scripts/electron-launch.js",
+        "desktop:mahasiswa": "node scripts/electron-launch.js --role=mahasiswa",
+        "desktop:dosen": "node scripts/electron-launch.js --role=dosen",
+        "desktop:admin": "node scripts/electron-launch.js --role=admin",
+        "desktop:all": "node scripts/electron-launch.js --role=all",
+        "dist:mahasiswa": "electron-builder --config electron-builder.mahasiswa.yml --dir",
+        "dist:dosen": "electron-builder --config electron-builder.dosen.yml --dir",
+        "dist:admin": "electron-builder --config electron-builder.admin.yml --dir",
+        "dist:all": "npm run dist:mahasiswa && npm run dist:dosen && npm run dist:admin"
+    },
+    "devDependencies": {
+        "axios": "^1.1.2",
+        "electron": "^26.0.0",
+        "electron-builder": "^24.13.3",
+        "laravel-vite-plugin": "^0.7.2",
+        "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "localtunnel": "^2.0.2"
+    }
+}
