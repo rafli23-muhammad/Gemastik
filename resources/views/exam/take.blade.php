@@ -347,6 +347,7 @@
     axios.defaults.headers.common['Accept'] = 'application/json';
 
     let examActive = false;
+    let blurGracePeriod = false;
     let violationCooldown = false;
     let currentIndex = 0;
     let countdownSeconds = configuredDuration;
@@ -1195,6 +1196,8 @@ setInterval(checkExamStatus,5000);
             btnStart.classList.add('opacity-70', 'cursor-wait');
 
             try {
+                blurGracePeriod = true;
+                setTimeout(() => { blurGracePeriod = false; }, 3000);
                 examActive = true;
                 countdownSeconds = configuredDuration;
                 await requestFullscreen();
@@ -1300,7 +1303,7 @@ setInterval(checkExamStatus,5000);
     }
 
     document.addEventListener('visibilitychange', () => {
-        if (!examActive || !document.hidden) return;
+        if (!examActive || !document.hidden || blurGracePeriod) return;
         reportViolation({
             showModal: true,
             violationType: 'tab-switch',
@@ -1309,7 +1312,7 @@ setInterval(checkExamStatus,5000);
     });
 
     window.addEventListener('blur', () => {
-        if (examActive) {
+        if (examActive && !blurGracePeriod) {
             reportViolation({
                 showModal: true,
                 violationType: 'window-blur',
