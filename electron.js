@@ -3,12 +3,12 @@ const { spawn, exec } = require('child_process');
 const http = require('http');
 
 const REMOTE_DESKTOP_PROCESSES = [
-  'anydesk.exe', 'anydesk',
-  'teamviewer.exe', 'teamviewer',
-  'ultraviewer.exe', 'ultraviewer_desktop.exe', 'ultraviewer',
-  'rustdesk.exe', 'rustdesk',
-  'mstsc.exe', 'rdpclip.exe',
-  'chrome-remote-desktop', 'remoting_host.exe'
+  '"anydesk.exe"',
+  '"teamviewer.exe"',
+  '"ultraviewer.exe"',
+  '"ultraviewer_desktop.exe"',
+  '"rustdesk.exe"',
+  '"mstsc.exe"'
 ];
 
 function checkRemoteDesktopProcesses(callback) {

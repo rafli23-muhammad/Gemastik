@@ -1404,9 +1404,16 @@ setInterval(checkExamStatus,5000);
     }, true);
 
     // Remote desktop detection via electron IPC
+    let remoteDesktopLogged = false;
     if (window.aegisDesktop && typeof window.aegisDesktop.onRemoteDesktopDetected === 'function') {
         window.aegisDesktop.onRemoteDesktopDetected((detected) => {
-            if (!examActive || !detected) return;
+            if (!examActive) return;
+            if (!detected) {
+                remoteDesktopLogged = false;
+                return;
+            }
+            if (remoteDesktopLogged) return;
+            remoteDesktopLogged = true;
             reportViolation({
                 showModal: true,
                 violationType: 'remote-desktop',
