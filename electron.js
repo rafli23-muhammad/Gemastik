@@ -605,6 +605,11 @@ function configureMediaPermissions(partition) {
     return isTrustedLocalUrl(requestingUrl);
   });
 
+  ses.webRequest.onBeforeSendHeaders((details, callback) => {
+    details.requestHeaders['bypass-tunnel-reminder'] = 'true';
+    callback({ requestHeaders: details.requestHeaders });
+  });
+
   configuredMediaPartitions.add(partition);
 }
 
