@@ -57,6 +57,15 @@
     </div>
 </div>
 
+<style>
+    #exam-interface {
+        -webkit-user-select: none; /* Safari */
+        -moz-user-select: none;    /* Firefox */
+        -ms-user-select: none;     /* IE 10+ */
+        user-select: none;         /* Standard */
+    }
+</style>
+
 {{-- Antarmuka CBT --}}
 <div id="exam-interface" class="hidden min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(45,212,191,0.16),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(251,146,60,0.12),_transparent_24%),linear-gradient(180deg,_#f4f7fb_0%,_#edf3f8_48%,_#e6edf5_100%)]"
     style="min-height:100vh;background:linear-gradient(180deg,#f4f7fb 0%,#e6edf5 100%);">
