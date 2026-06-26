@@ -3,13 +3,19 @@ AegisExam Desktop — Cara Menjalankan
 
 
 CARA PAKAI (PENTING — pakai yang di folder win-unpacked):
-1. Buka folder dist\mahasiswa\win-unpacked
-   → Double-click "AegisExam Mahasiswa.exe"
+1. Buka folder dist\admin\win-unpacked
+   → Double-click "AegisExam Admin.exe"
+   → Gunakan username "admin" dan password "admin" untuk masuk dan mendaftarkan data Mahasiswa/Dosen.
 
 2. Buka folder dist\dosen\win-unpacked
    → Double-click "AegisExam Dosen.exe"
+   → Login dengan NIP & Email yang sudah didaftarkan di Admin.
 
-JANGAN pakai file "AegisExam Mahasiswa 1.0.0.exe" di luar folder win-unpacked.
+3. Buka folder dist\mahasiswa\win-unpacked
+   → Double-click "AegisExam Mahasiswa.exe"
+   → Hubungkan ke Server Dosen (LAN/Cloud) dan login dengan NIM & Email yang sudah terdaftar.
+
+JANGAN pakai file installer .exe di luar folder win-unpacked.
 Itu installer portable LAMA (bisa tidak muncul / versi usang). Abaikan atau hapus saja.
 
 3. MODE CLOUD (rumah ↔ kampus, pakai internet):
