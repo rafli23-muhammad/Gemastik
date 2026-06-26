@@ -8,4 +8,11 @@ contextBridge.exposeInMainWorld('aegisDesktop', {
   openServerSetup: () => ipcRenderer.invoke('aegis-open-server-setup'),
   retryServerConnection: () => ipcRenderer.invoke('aegis-retry-server-connection'),
   getServerInfo: () => ipcRenderer.invoke('aegis-get-server-info'),
+  onRemoteDesktopDetected: (callback) => {
+    const listener = (event, data) => callback(data);
+    ipcRenderer.on('aegis-remote-desktop-detected', listener);
+    return () => {
+      ipcRenderer.removeListener('aegis-remote-desktop-detected', listener);
+    };
+  },
 });

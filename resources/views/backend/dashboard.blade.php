@@ -169,6 +169,15 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-3">
+                        <!-- Alarm Suara Toggle Button -->
+                        <button id="btn-toggle-alarm" type="button" class="flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/70 px-4 py-3 text-left transition hover:bg-rose-100/70 focus:outline-none">
+                            <i id="alarm-icon" class="fa-solid fa-bell text-rose-600 text-lg animate-pulse"></i>
+                            <div>
+                                <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Alarm Suara</p>
+                                <p id="alarm-status-text" class="mt-0.5 text-xs font-bold text-rose-600">AKTIF (KLIK UNTUK MATIKAN)</p>
+                            </div>
+                        </button>
+
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                             <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Status Sistem</p>
                             <p id="backend-live-status" class="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-700">
@@ -1181,6 +1190,16 @@
                 }
 
                 if (violationBlockSignature !== nextViolationBlockSignature) {
+                    const prevCount = violationBlockSignature ? JSON.parse(violationBlockSignature).violations_count : 0;
+                    const nextCount = (data.violation_logs || []).length;
+                    
+                    if (nextCount > prevCount) {
+                        if (alarmEnabled) {
+                            playLoudAlarm();
+                            localStorage.setItem('play_alarm_on_load', 'true');
+                        }
+                    }
+
                     violationBlockSignature = nextViolationBlockSignature;
                     studentsSignature = nextStudentsSignature;
 
@@ -1207,6 +1226,94 @@
                 console.warn('Auto update backend gagal:', error);
             } finally {
                 monitorInFlight = false;
+            }
+        }
+
+        // Alarm Suara logic using Web Audio API
+        let alarmAudioCtx = null;
+        function playLoudAlarm() {
+            try {
+                if (!alarmAudioCtx) {
+                    alarmAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (alarmAudioCtx.state === 'suspended') {
+                    alarmAudioCtx.resume();
+                }
+                
+                const now = alarmAudioCtx.currentTime;
+                const duration = 1.8;
+                
+                const osc1 = alarmAudioCtx.createOscillator();
+                const osc2 = alarmAudioCtx.createOscillator();
+                const gainNode = alarmAudioCtx.createGain();
+                
+                osc1.type = 'sawtooth';
+                osc2.type = 'sine';
+                
+                osc1.frequency.setValueAtTime(880, now);
+                osc2.frequency.setValueAtTime(440, now);
+                
+                // siren sound
+                const step = 0.15;
+                for (let t = 0; t < duration; t += step) {
+                    osc1.frequency.setValueAtTime(t % (step * 2) === 0 ? 988 : 880, now + t);
+                    osc2.frequency.setValueAtTime(t % (step * 2) === 0 ? 523 : 440, now + t);
+                }
+                
+                gainNode.gain.setValueAtTime(1.0, now);
+                gainNode.gain.setValueAtTime(1.0, now + duration - 0.3);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration);
+                
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                gainNode.connect(alarmAudioCtx.destination);
+                
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + duration);
+                osc2.stop(now + duration);
+            } catch (e) {
+                console.warn('Gagal memutar alarm suara:', e);
+            }
+        }
+
+        const btnToggleAlarm = document.getElementById('btn-toggle-alarm');
+        const alarmIcon = document.getElementById('alarm-icon');
+        const alarmStatusText = document.getElementById('alarm-status-text');
+        
+        let alarmEnabled = localStorage.getItem('aegis_alarm_enabled') !== 'false';
+        
+        function updateAlarmButtonUI() {
+            if (alarmEnabled) {
+                alarmIcon.className = 'fa-solid fa-bell text-rose-600 text-lg animate-pulse';
+                alarmStatusText.textContent = 'AKTIF (KLIK UNTUK MATIKAN)';
+                alarmStatusText.className = 'mt-0.5 text-xs font-bold text-rose-600';
+                btnToggleAlarm.className = 'flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/70 px-4 py-3 text-left transition hover:bg-rose-100/70 focus:outline-none';
+            } else {
+                alarmIcon.className = 'fa-solid fa-bell-slash text-slate-400 text-lg';
+                alarmStatusText.textContent = 'MATI (KLIK UNTUK AKTIFKAN)';
+                alarmStatusText.className = 'mt-0.5 text-xs font-bold text-slate-500';
+                btnToggleAlarm.className = 'flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left transition hover:bg-slate-100 focus:outline-none';
+            }
+        }
+        
+        if (btnToggleAlarm) {
+            btnToggleAlarm.addEventListener('click', () => {
+                alarmEnabled = !alarmEnabled;
+                localStorage.setItem('aegis_alarm_enabled', alarmEnabled ? 'true' : 'false');
+                updateAlarmButtonUI();
+                if (alarmEnabled) {
+                    playLoudAlarm();
+                }
+            });
+            updateAlarmButtonUI();
+        }
+
+        // Play alarm on page load if redirect flag exists
+        if (localStorage.getItem('play_alarm_on_load') === 'true') {
+            localStorage.removeItem('play_alarm_on_load');
+            if (alarmEnabled) {
+                setTimeout(playLoudAlarm, 300);
             }
         }
 

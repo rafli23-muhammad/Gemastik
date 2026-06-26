@@ -464,6 +464,7 @@ Route::get('/exam', function () {
     }));
 
     if (!empty($selectedQuestions)) {
+        shuffle($selectedQuestions);
         $questionsPayload = array_map(function ($q, $idx) {
             return [
                 'id' => $q['id'] ?? ($idx + 1),
@@ -527,7 +528,10 @@ Route::get('/exam', function () {
                 'text' => $text,
                 'options' => $mockOptions,
             ];
-        })->values()->all();
+        })->values()->shuffle()->map(function ($q, $idx) {
+            $q['number'] = $idx + 1;
+            return $q;
+        })->all();
     }
 
     $examDuration = $backend['exam_duration_seconds'] ?? 7200;

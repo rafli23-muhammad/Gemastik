@@ -1308,6 +1308,103 @@ setInterval(checkExamStatus,5000);
             });
         }
     });
+
+    // Block clipboard actions
+    document.addEventListener('copy', (e) => {
+        if (!examActive) return;
+        e.preventDefault();
+        reportViolation({
+            showModal: true,
+            violationType: 'clipboard-copy',
+            violationMessage: 'Mahasiswa mencoba menyalin teks (Copy) dari ujian.',
+        });
+    });
+
+    document.addEventListener('cut', (e) => {
+        if (!examActive) return;
+        e.preventDefault();
+        reportViolation({
+            showModal: true,
+            violationType: 'clipboard-cut',
+            violationMessage: 'Mahasiswa mencoba memotong teks (Cut) dari ujian.',
+        });
+    });
+
+    document.addEventListener('paste', (e) => {
+        if (!examActive) return;
+        e.preventDefault();
+        reportViolation({
+            showModal: true,
+            violationType: 'clipboard-paste',
+            violationMessage: 'Mahasiswa mencoba menempel teks (Paste) ke kolom jawaban.',
+        });
+    });
+
+    // Block dangerous keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+        if (!examActive) return;
+
+        // Block F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+            reportViolation({
+                showModal: true,
+                violationType: 'keyboard-shortcut',
+                violationMessage: 'Mahasiswa menekan tombol F12 (Membuka Developer Tools).',
+            });
+            return false;
+        }
+
+        // Block Ctrl/Cmd combinations
+        if (e.ctrlKey || e.metaKey) {
+            const key = e.key.toLowerCase();
+            
+            // Common forbidden actions: C (Copy), V (Paste), X (Cut), U (Source), S (Save), P (Print), R (Reload), F (Search)
+            if (['c', 'v', 'x', 'u', 's', 'p', 'r', 'f'].includes(key)) {
+                e.preventDefault();
+                const shortcutName = `Ctrl + ${key.toUpperCase()}`;
+                let actionName = 'shortcut berbahaya';
+                if (key === 'c') actionName = 'menyalin teks';
+                if (key === 'v') actionName = 'menempel teks';
+                if (key === 'x') actionName = 'memotong teks';
+                if (key === 'u') actionName = 'melihat kode sumber';
+                if (key === 's') actionName = 'menyimpan halaman';
+                if (key === 'p') actionName = 'mencetak halaman';
+                if (key === 'r') actionName = 'memuat ulang halaman';
+                if (key === 'f') actionName = 'mencari teks';
+
+                reportViolation({
+                    showModal: true,
+                    violationType: 'keyboard-shortcut',
+                    violationMessage: `Mahasiswa menekan shortcut ${shortcutName} (${actionName}).`,
+                });
+                return false;
+            }
+
+            // Block Ctrl + Shift + I/J/C (Developer Tools shortcuts)
+            if (e.shiftKey && ['i', 'j', 'c'].includes(key)) {
+                e.preventDefault();
+                reportViolation({
+                    showModal: true,
+                    violationType: 'keyboard-shortcut',
+                    violationMessage: `Mahasiswa menekan shortcut Ctrl+Shift+${key.toUpperCase()} (Developer Tools).`,
+                });
+                return false;
+            }
+        }
+    }, true);
+
+    // Remote desktop detection via electron IPC
+    if (window.aegisDesktop && typeof window.aegisDesktop.onRemoteDesktopDetected === 'function') {
+        window.aegisDesktop.onRemoteDesktopDetected((detected) => {
+            if (!examActive || !detected) return;
+            reportViolation({
+                showModal: true,
+                violationType: 'remote-desktop',
+                violationMessage: 'Mahasiswa terdeteksi menjalankan aplikasi Remote Desktop / Screen Sharing (AnyDesk, TeamViewer, RDP, UltraViewer, RustDesk, dll).',
+            });
+        });
+    }
     });
 </script>
 @endpush

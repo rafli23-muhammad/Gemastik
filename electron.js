@@ -1,6 +1,35 @@
 const { app, BrowserWindow, session, ipcMain, protocol } = require('electron');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 const http = require('http');
+
+const REMOTE_DESKTOP_PROCESSES = [
+  'anydesk.exe', 'anydesk',
+  'teamviewer.exe', 'teamviewer',
+  'ultraviewer.exe', 'ultraviewer_desktop.exe', 'ultraviewer',
+  'rustdesk.exe', 'rustdesk',
+  'mstsc.exe', 'rdpclip.exe',
+  'chrome-remote-desktop', 'remoting_host.exe'
+];
+
+function checkRemoteDesktopProcesses(callback) {
+  if (process.platform !== 'win32') {
+    callback(false);
+    return;
+  }
+  
+  exec('tasklist /NH /FO CSV', (err, stdout, stderr) => {
+    if (err || !stdout) {
+      callback(false);
+      return;
+    }
+    
+    const running = stdout.toLowerCase();
+    const detected = REMOTE_DESKTOP_PROCESSES.some(p => running.includes(p.toLowerCase()));
+    const hasRdpSession = process.env.SESSIONNAME && process.env.SESSIONNAME.toLowerCase().startsWith('rdp');
+    
+    callback(detected || hasRdpSession);
+  });
+}
 const https = require('https');
 const os = require('os');
 const path = require('path');
@@ -1143,11 +1172,24 @@ async function startMahasiswaApp() {
   showLoadingInWindow(win, 'mahasiswa');
   await loadMahasiswaClientPage(win);
 }
-
 app.whenReady().then(async () => {
   const role = getRole();
 
   initNetworking(role);
+
+  if (role === 'mahasiswa' || role === 'all') {
+    setInterval(() => {
+      checkRemoteDesktopProcesses((detected) => {
+        if (detected) {
+          BrowserWindow.getAllWindows().forEach((win) => {
+            if (!win.isDestroyed()) {
+              win.webContents.send('aegis-remote-desktop-detected', true);
+            }
+          });
+        }
+      });
+    }, 3000);
+  }
 
   try {
     if (role === 'mahasiswa') {
